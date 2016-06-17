@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.http.CacheControl
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 
 val rootFolder = "/volume1/Verkkolevy/sync/Google valokuvat"
 val rootFolder2 = "/Volumes/Verkkolevy/sync/Google valokuvat"
+
 
 @SpringBootApplication
 open class Application : WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter() {
@@ -28,8 +30,12 @@ open class Application : WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter(
         if(registry != null) {
             registry.addResourceHandler("/images/**")
                     .addResourceLocations("file:" + fi.hnybom.photostreamer.rootFolder2 + "/")
+
+            registry.addResourceHandler("/**")
+                    .addResourceLocations("classpath:/public/")
+                    .setCacheControl(CacheControl.noCache());
         }
-        super.addResourceHandlers(registry)
+
     }
 }
 

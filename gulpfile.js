@@ -8,12 +8,13 @@ var jshint = require('gulp-jshint');
 var uglify = require('gulp-uglify');
 var minifycss = require('gulp-minify-css');
 var sass = require('gulp-sass');
+var del = require('del');
 var browserSync = require('browser-sync');
 
 gulp.task('browser-sync', function() {
   browserSync({
     server: {
-       baseDir: "./"
+       baseDir: "src/main/resources/public/"
     }
   });
 });
@@ -22,9 +23,14 @@ gulp.task('bs-reload', function () {
   browserSync.reload();
 });
 
+gulp.task('html', function(){
+  return gulp.src(['src/client/html/**/*.html'])
+  .pipe(gulp.dest('src/main/resources/public/'))
+  .pipe(browserSync.reload({stream:true}))
+ });
 
 gulp.task('styles', function(){
-  gulp.src(['src/client/sass/**/*.scss'])
+  return gulp.src(['src/client/sass/**/*.scss'])
     .pipe(plumber({
       errorHandler: function (error) {
         console.log(error.message);
@@ -57,8 +63,29 @@ gulp.task('scripts', function(){
     .pipe(browserSync.reload({stream:true}))
 });
 
-gulp.task('default', ['browser-sync'], function(){
+gulp.task('libs', function() {
+  return gulp.src([
+      'node_modules/core-js/client/shim.min.js',
+      'node_modules/zone.js/dist/zone.js',
+      'node_modules/reflect-metadata/Reflect.js',
+      'node_modules/rxjs/bundles/Rx.umd.js',
+      'node_modules/@angular/core/bundles/core.umd.js',
+      'node_modules/@angular/common/bundles/common.umd.js',
+      'node_modules/@angular/compiler/bundles/compiler.umd.js',
+      'node_modules/@angular/platform-browser/bundles/platform-browser.umd.js',
+      'node_modules/@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js'
+    ])
+    .pipe(gulp.dest('src/main/resources/public/js/lib'))
+});
+
+gulp.task('clean', function () {
+  return del('src/main/resources/public/**/*');
+});
+
+gulp.task('watch', function(){
   gulp.watch("src/client/sass/**/*.scss", ['styles']);
   gulp.watch("src/client/js/**/*.js", ['scripts']);
-  gulp.watch("*.html", ['bs-reload']);
+  gulp.watch("src/client/html/**/*.html", ['html']);
 });
+
+gulp.task('default', ['libs', 'styles', 'scripts', 'html'])

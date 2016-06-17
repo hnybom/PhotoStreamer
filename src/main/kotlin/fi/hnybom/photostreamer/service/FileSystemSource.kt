@@ -13,24 +13,18 @@ data class Photo(val name: String, val timestamp: Date, val path: String)
 @Service
 class FileSystemSource {
 
-    val emptyPhoto = Photo("", Date(), "")
-
     val photos: List<Photo>
 
     init {
         val walker = File(fi.hnybom.photostreamer.rootFolder2).walkTopDown()
-        val mappedPhotos = walker.map(fun(file): Photo {
-            if(file.name.endsWith("jpg", true) || file.name.endsWith("jpeg", true)) {
-                return Photo(file.name, Date(file.lastModified()), "/images/" + file.absolutePath.substring(fi.hnybom.photostreamer.rootFolder2.length))
-            }
-            return emptyPhoto
-        })
-
-        photos = mappedPhotos.filter { f -> f != emptyPhoto }.sortedBy { p -> p.timestamp }.toList()
+        photos = walker
+                .filter{it.name.endsWith("jpg", true) || it.name.endsWith("jpeg", true)}
+                .map{Photo(it.name, Date(it.lastModified()), "/images/" + it.absolutePath.substring(fi.hnybom.photostreamer.rootFolder2.length))}
+                .sortedBy { it.timestamp }.toList()
     }
 
     fun findPhotos(start:Date, end:Date):List<Photo> {
-        return photos.filter { p -> p.timestamp.after(start) && p.timestamp.before(end) }
+        return photos.filter { it.timestamp.after(start) && it.timestamp.before(end) }
     }
 
 }
