@@ -1,91 +1,153 @@
-var gulp = require('gulp'),
-    plumber = require('gulp-plumber'),
-    rename = require('gulp-rename');
+var gulp         = require('gulp');
 var autoprefixer = require('gulp-autoprefixer');
-var babel = require('gulp-babel');
-var concat = require('gulp-concat');
-var jshint = require('gulp-jshint');
-var uglify = require('gulp-uglify');
-var minifycss = require('gulp-minify-css');
-var sass = require('gulp-sass');
-var del = require('del');
-var browserSync = require('browser-sync');
+var babel        = require('gulp-babel');
+var browserSync  = require('browser-sync');
+var concat       = require('gulp-concat');
+var eslint       = require('gulp-eslint');
+var filter       = require('gulp-filter');
+var newer        = require('gulp-newer');
+var notify       = require('gulp-notify');
+var plumber      = require('gulp-plumber');
+var reload       = browserSync.reload;
+var sass         = require('gulp-sass');
+var sourcemaps   = require('gulp-sourcemaps');
 
-gulp.task('browser-sync', function() {
+var onError = function(err) {
+  notify.onError({
+    title:    "Error",
+    message:  "<%= error %>",
+  })(err);
+  this.emit('end');
+};
+
+var plumberOptions = {
+  errorHandler: onError,
+};
+
+var jsFiles = {
+  vendor: [
+     '!src/client/js/vendor/**/*.js',
+  ],
+  source: [
+    'src/client/js/**/*.js',
+    'src/client/js/**/*.jsx'
+  ]
+};
+
+// Lint JS/JSX files
+gulp.task('eslint', function() {
+  return gulp.src(jsFiles.source)
+    .pipe(eslint({
+      baseConfig: {
+        "ecmaFeatures": {
+           "jsx": true
+         }
+      }
+    }))
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+});
+
+// Copy react.js and react-dom.js to assets/js/src/vendor
+// only if the copy in node_modules is "newer"
+gulp.task('copy-react', function() {
+  return gulp.src('node_modules/react/dist/react.js')
+    .pipe(newer('src/client/js/vendor/react.js'))
+    .pipe(gulp.dest('src/client/js/vendor'));
+});
+
+gulp.task('copy-react-dom', function() {
+  return gulp.src('node_modules/react-dom/dist/react-dom.js')
+    .pipe(newer('src/client/js/vendor/react-dom.js'))
+    .pipe(gulp.dest('src/client/js/vendor'));
+});
+
+gulp.task('copy-reflux', function() {
+  return gulp.src('node_modules/reflux/dist/reflux.min.js')
+    .pipe(newer('src/client/js/vendor/reflux.min.js'))
+    .pipe(gulp.dest('src/client/js/vendor'));
+});
+
+// Copy assets/js/vendor/*
+gulp.task('copy-js-vendor', function() {
+  return gulp
+    .src([
+      'src/client/js/vendor/**/*.js'
+    ])
+    .pipe(gulp.dest('src/main/resources/public/js/lib'));
+});
+
+gulp.task('copy-html', function() {
+  return gulp
+    .src([
+      'src/client/html/**/*.html'
+    ])
+    .pipe(gulp.dest('src/main/resources/public/'));
+});
+
+// Concatenate jsFiles.vendor and jsFiles.source into one JS file.
+// Run copy-react and eslint before concatenating
+gulp.task('concat', ['copy-react', 'copy-react-dom', 'copy-reflux', 'eslint'], function() {
+  return gulp.src(jsFiles.vendor.concat(jsFiles.source))
+    .pipe(sourcemaps.init())
+    .pipe(babel({
+      only: [
+        'src/client/js/components',
+      ],
+      compact: false
+    }))
+    .pipe(concat('app.js'))
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('src/main/resources/public/js'));
+});
+
+// Compile Sass to CSS
+gulp.task('sass', function() {
+  var autoprefixerOptions = {
+    browsers: ['last 2 versions'],
+  };
+
+  var filterOptions = '**/*.css';
+
+  var reloadOptions = {
+    stream: true,
+  };
+
+  var sassOptions = {
+    includePaths: [
+
+    ]
+  };
+
+  return gulp.src('src/client/sass/**/*.scss')
+    .pipe(plumber(plumberOptions))
+    .pipe(sourcemaps.init())
+    .pipe(sass(sassOptions))
+    .pipe(autoprefixer(autoprefixerOptions))
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('src/main/resources/public/css'))
+    .pipe(filter(filterOptions))
+    .pipe(reload(reloadOptions));
+});
+
+// Watch JS/JSX and Sass files
+gulp.task('watch', function() {
+  gulp.watch('src/client/js/**/*.{js,jsx}', ['concat']);
+  gulp.watch('src/client/sass/**/*.scss', ['sass']);
+  gulp.watch('src/client/html/**/*.html', ['copy-html']);
+});
+
+// BrowserSync
+gulp.task('browsersync', function() {
   browserSync({
     server: {
-       baseDir: "src/main/resources/public/"
-    }
+      baseDir: './src/main/resources/public/'
+    },
+    open: false,
+    online: false,
+    notify: false,
   });
 });
 
-gulp.task('bs-reload', function () {
-  browserSync.reload();
-});
-
-gulp.task('html', function(){
-  return gulp.src(['src/client/html/**/*.html'])
-  .pipe(gulp.dest('src/main/resources/public/'))
-  .pipe(browserSync.reload({stream:true}))
- });
-
-gulp.task('styles', function(){
-  return gulp.src(['src/client/sass/**/*.scss'])
-    .pipe(plumber({
-      errorHandler: function (error) {
-        console.log(error.message);
-        this.emit('end');
-    }}))
-    .pipe(sass())
-    .pipe(autoprefixer('last 2 versions'))
-    .pipe(gulp.dest('src/main/resources/public/css/'))
-    .pipe(rename({suffix: '.min'}))
-    .pipe(minifycss())
-    .pipe(gulp.dest('src/main/resources/public/css/'))
-    .pipe(browserSync.reload({stream:true}))
-});
-
-gulp.task('scripts', function(){
-  return gulp.src('src/client/js/**/*.js')
-    .pipe(plumber({
-      errorHandler: function (error) {
-        console.log(error.message);
-        this.emit('end');
-    }}))
-    .pipe(jshint())
-    .pipe(jshint.reporter('default'))
-    .pipe(concat('main.js'))
-    .pipe(babel())
-    .pipe(gulp.dest('src/main/resources/public/js/'))
-    .pipe(rename({suffix: '.min'}))
-    .pipe(uglify())
-    .pipe(gulp.dest('src/main/resources/public/js/'))
-    .pipe(browserSync.reload({stream:true}))
-});
-
-gulp.task('libs', function() {
-  return gulp.src([
-      'node_modules/core-js/client/shim.min.js',
-      'node_modules/zone.js/dist/zone.js',
-      'node_modules/reflect-metadata/Reflect.js',
-      'node_modules/rxjs/bundles/Rx.umd.js',
-      'node_modules/@angular/core/bundles/core.umd.js',
-      'node_modules/@angular/common/bundles/common.umd.js',
-      'node_modules/@angular/compiler/bundles/compiler.umd.js',
-      'node_modules/@angular/platform-browser/bundles/platform-browser.umd.js',
-      'node_modules/@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js'
-    ])
-    .pipe(gulp.dest('src/main/resources/public/js/lib'))
-});
-
-gulp.task('clean', function () {
-  return del('src/main/resources/public/**/*');
-});
-
-gulp.task('watch', function(){
-  gulp.watch("src/client/sass/**/*.scss", ['styles']);
-  gulp.watch("src/client/js/**/*.js", ['scripts']);
-  gulp.watch("src/client/html/**/*.html", ['html']);
-});
-
-gulp.task('default', ['libs', 'styles', 'scripts', 'html'])
+gulp.task('build', ['sass', 'copy-html','copy-js-vendor', 'concat']);
+gulp.task('default', ['build', 'browsersync', 'watch']);
