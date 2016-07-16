@@ -1,15 +1,22 @@
-// tutorial1.js
-var PhotoStreamer = React.createClass({
-  render: function() {
-    return (
-      <div className="photoStreamer">
-        Hello, world! I am a PhotoStreamer.
-      </div>
-    );
-  }
-});
+import React, {Component} from 'react';
+import PhotoSearchBox from './PhotoSearchBox.jsx';
 
-ReactDOM.render(
-  <PhotoStreamer />,
-  document.getElementById('content')
-);
+class PhotoStreamer extends Component {
+
+    constructor() {
+        super();
+    }
+
+    render() {
+        return (
+            <div class="photoStreamer">
+                <h1>Etsi kuvia</h1>
+                <PhotoSearchBox />
+            </div>
+        );
+        
+    }
+
+}
+
+export default PhotoStreamer;

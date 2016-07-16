@@ -11,6 +11,10 @@ var plumber      = require('gulp-plumber');
 var reload       = browserSync.reload;
 var sass         = require('gulp-sass');
 var sourcemaps   = require('gulp-sourcemaps');
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
+var gutil = require('gulp-util');
+var babelify = require('babelify');
 
 var onError = function(err) {
   notify.onError({
@@ -85,20 +89,51 @@ gulp.task('copy-html', function() {
     .pipe(gulp.dest('src/main/resources/public/'));
 });
 
-// Concatenate jsFiles.vendor and jsFiles.source into one JS file.
-// Run copy-react and eslint before concatenating
-gulp.task('concat', ['copy-react', 'copy-react-dom', 'copy-reflux', 'eslint'], function() {
-  return gulp.src(jsFiles.vendor.concat(jsFiles.source))
-    .pipe(sourcemaps.init())
-    .pipe(babel({
-      only: [
-        'src/client/js/components',
-      ],
-      compact: false
-    }))
-    .pipe(concat('app.js'))
-    .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('src/main/resources/public/js'));
+
+var scriptsCount = 0;
+
+var dependencies = [
+    'react',
+    'react-dom',
+    'reflux'
+];
+
+
+gulp.task('scripts', ['copy-react', 'copy-react-dom', 'copy-reflux'], function() {
+    var appBundler = browserify({
+        entries: 'src/client/js/app.jsx',
+        debug: true
+    });
+
+    if (scriptsCount === 1){
+        // create vendors.js for dev environment.
+        browserify({
+            require: dependencies,
+            debug: true
+        }).bundle()
+            .on('error', gutil.log)
+            .pipe(source('vendors.js'))
+            .pipe(gulp.dest('./src/main/resources/public/js/'));
+    }
+
+    // make the dependencies external so they dont get bundled by the
+    // app bundler. Dependencies are already bundled in vendor.js for
+    // development environments.
+    dependencies.forEach(function(dep){
+        appBundler.external(dep);
+    });
+
+
+    appBundler
+    // transform ES6 and JSX to ES5 with babelify
+        .transform("babelify", {presets: ["es2015", "react"]})
+        .bundle()
+        .on('error',gutil.log)
+
+        .pipe(source('bundle.js'))
+        .pipe(gulp.dest('./src/main/resources/public/js/'));
+
+
 });
 
 // Compile Sass to CSS
@@ -149,5 +184,5 @@ gulp.task('browsersync', function() {
   });
 });
 
-gulp.task('build', ['sass', 'copy-html','copy-js-vendor', 'concat']);
+gulp.task('build', ['sass', 'copy-html','copy-js-vendor', 'scripts']);
 gulp.task('default', ['build', 'browsersync', 'watch']);
