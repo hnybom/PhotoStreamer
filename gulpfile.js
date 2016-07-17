@@ -62,7 +62,9 @@ var scriptsCount = 0;
 var dependencies = [
     'react',
     'react-dom',
-    'reflux'
+    'reflux',
+    'moment',
+    'react-datepicker'
 ];
 
 gulp.task('scripts', function() {
@@ -122,20 +124,19 @@ gulp.task('sass', function() {
     ]
   };
 
-  return gulp.src('src/client/sass/**/*.scss')
+  return gulp.src('src/client/sass/**/*.{scss,css}')
     .pipe(plumber(plumberOptions))
     .pipe(sourcemaps.init())
     .pipe(sass(sassOptions))
     .pipe(autoprefixer(autoprefixerOptions))
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('src/main/resources/public/css'))
-    .pipe(filter(filterOptions))
     .pipe(reload(reloadOptions));
 });
 
 // Watch JS/JSX and Sass files
 gulp.task('watch', function() {
-  gulp.watch('src/client/js/**/*.{js,jsx}', ['concat']);
+  gulp.watch('src/client/js/**/*.{js,jsx}', ['scripts']);
   gulp.watch('src/client/sass/**/*.scss', ['sass']);
   gulp.watch('src/client/html/**/*.html', ['copy-html']);
 });

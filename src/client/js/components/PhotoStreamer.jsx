@@ -9,7 +9,7 @@ class PhotoStreamer extends Component {
 
     render() {
         return (
-            <div class="photoStreamer">
+            <div className="photoStreamer">
                 <h1>Etsi kuvia</h1>
                 <PhotoSearchBox />
             </div>

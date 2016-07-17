@@ -7,7 +7,9 @@
   "author": "Quench",
   "license": "ISC",
   "dependencies": {
-    "bootstrap": "^3.3.6"
+    "bootstrap": "^3.3.6",
+    "moment": "^2.14.1",
+    "react-datepicker": "^0.28.1"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.9.0",
