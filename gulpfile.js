@@ -29,9 +29,6 @@ var plumberOptions = {
 };
 
 var jsFiles = {
-  vendor: [
-     '!src/client/js/vendor/**/*.js',
-  ],
   source: [
     'src/client/js/**/*.js',
     'src/client/js/**/*.jsx'
@@ -52,35 +49,6 @@ gulp.task('eslint', function() {
     .pipe(eslint.failAfterError());
 });
 
-// Copy react.js and react-dom.js to assets/js/src/vendor
-// only if the copy in node_modules is "newer"
-gulp.task('copy-react', function() {
-  return gulp.src('node_modules/react/dist/react.js')
-    .pipe(newer('src/client/js/vendor/react.js'))
-    .pipe(gulp.dest('src/client/js/vendor'));
-});
-
-gulp.task('copy-react-dom', function() {
-  return gulp.src('node_modules/react-dom/dist/react-dom.js')
-    .pipe(newer('src/client/js/vendor/react-dom.js'))
-    .pipe(gulp.dest('src/client/js/vendor'));
-});
-
-gulp.task('copy-reflux', function() {
-  return gulp.src('node_modules/reflux/dist/reflux.min.js')
-    .pipe(newer('src/client/js/vendor/reflux.min.js'))
-    .pipe(gulp.dest('src/client/js/vendor'));
-});
-
-// Copy assets/js/vendor/*
-gulp.task('copy-js-vendor', function() {
-  return gulp
-    .src([
-      'src/client/js/vendor/**/*.js'
-    ])
-    .pipe(gulp.dest('src/main/resources/public/js/lib'));
-});
-
 gulp.task('copy-html', function() {
   return gulp
     .src([
@@ -88,7 +56,6 @@ gulp.task('copy-html', function() {
     ])
     .pipe(gulp.dest('src/main/resources/public/'));
 });
-
 
 var scriptsCount = 0;
 
@@ -98,8 +65,9 @@ var dependencies = [
     'reflux'
 ];
 
+gulp.task('scripts', function() {
+    scriptsCount++;
 
-gulp.task('scripts', ['copy-react', 'copy-react-dom', 'copy-reflux'], function() {
     var appBundler = browserify({
         entries: 'src/client/js/app.jsx',
         debug: true
@@ -184,5 +152,5 @@ gulp.task('browsersync', function() {
   });
 });
 
-gulp.task('build', ['sass', 'copy-html','copy-js-vendor', 'scripts']);
+gulp.task('build', ['sass', 'copy-html', 'scripts']);
 gulp.task('default', ['build', 'browsersync', 'watch']);
