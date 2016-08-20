@@ -62,7 +62,7 @@ var scriptsCount = 0;
 var dependencies = [
     'react',
     'react-dom',
-    'reflux',
+    'flux',
     'moment',
     'react-datepicker'
 ];

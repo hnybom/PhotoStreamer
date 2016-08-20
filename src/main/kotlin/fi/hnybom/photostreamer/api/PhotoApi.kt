@@ -17,8 +17,7 @@ import java.util.*
 
 @RestController
 class PhotoApi @Autowired constructor(val service:FileSystemSource) {
-
-
+    
     @RequestMapping("/api/find")
     fun find(@RequestParam(value = "from", required = true) @DateTimeFormat(pattern="yyyy-MM-dd") fromDate: Date,
              @RequestParam(value = "to", required = true) @DateTimeFormat(pattern="yyyy-MM-dd") toDate: Date) : List<Photo> {

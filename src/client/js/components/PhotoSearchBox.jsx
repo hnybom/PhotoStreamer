@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {searchImages} from '../actions/PhotoStreamerActions'
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 
@@ -16,12 +17,18 @@ class PhotoSearchBox extends Component {
         this.setState({
             startDate : date
         });
+        this.triggerActionsIfDatesSet();
     }
 
     handleEndTimeChange(date) {
         this.setState({
             endDate : date
         });
+        this.triggerActionsIfDatesSet();
+    }
+
+    triggerActionsIfDatesSet() {
+        if (this.state.startDate && this.state.endDate) searchImages(this.state)
     }
     
     render() {

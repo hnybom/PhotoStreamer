@@ -15,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 
 val rootFolder = "/volume1/Verkkolevy/sync/Google valokuvat"
 val rootFolder2 = "/Volumes/Verkkolevy/sync/Google valokuvat"
+val rootFolder3 = "/Users/hnybom/Pictures/test"
 
 
 @SpringBootApplication
@@ -29,7 +30,7 @@ open class Application : WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter(
 
         if(registry != null) {
             registry.addResourceHandler("/images/**")
-                    .addResourceLocations("file:" + fi.hnybom.photostreamer.rootFolder2 + "/")
+                    .addResourceLocations("file:" + fi.hnybom.photostreamer.rootFolder3 + "/")
 
             registry.addResourceHandler("/**")
                     .addResourceLocations("classpath:/public/")
