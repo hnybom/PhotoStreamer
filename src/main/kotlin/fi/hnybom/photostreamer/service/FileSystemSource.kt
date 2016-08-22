@@ -19,7 +19,7 @@ class FileSystemSource {
         val walker = File(fi.hnybom.photostreamer.rootFolder2).walkTopDown()
         photos = walker
                 .filter{it.name.endsWith("jpg", true) || it.name.endsWith("jpeg", true)}
-                .map{Photo(it.name, Date(it.lastModified()), "/images/" + it.absolutePath.substring(fi.hnybom.photostreamer.rootFolder3.length))}
+                .map{Photo(it.name, Date(it.lastModified()), "/images/" + it.absolutePath.substring(fi.hnybom.photostreamer.rootFolder2.length))}
                 .sortedBy { it.timestamp }.toList()
     }
 

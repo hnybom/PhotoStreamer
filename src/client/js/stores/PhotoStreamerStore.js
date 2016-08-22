@@ -29,15 +29,18 @@ class PhotoStreamerStore extends EventEmitter {
 
 }
 
-const store = new PhotoStreamerStore();
+const PhotoStreamerStoreInstance = new PhotoStreamerStore();
 
-/ Register each of the actions with the dispatcher
+// Register each of the actions with the dispatcher
 // by changing the store's data and emitting a
 // change
 AppDispatcher.register((payload) => {
     const action = payload.action;
 
     switch (action.actionType) {
-        case PhotoStreamerConstants.SEARCH_PHOTOS
+        case PhotoStreamerConstants.RECEIVE_PHOTOS:
+            console.log(payload.action.data);
     }
-};
+});
+
+export default PhotoStreamerStoreInstance;

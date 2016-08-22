@@ -30,7 +30,7 @@ open class Application : WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter(
 
         if(registry != null) {
             registry.addResourceHandler("/images/**")
-                    .addResourceLocations("file:" + fi.hnybom.photostreamer.rootFolder3 + "/")
+                    .addResourceLocations("file:" + fi.hnybom.photostreamer.rootFolder2 + "/")
 
             registry.addResourceHandler("/**")
                     .addResourceLocations("classpath:/public/")

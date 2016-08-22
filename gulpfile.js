@@ -64,7 +64,8 @@ var dependencies = [
     'react-dom',
     'flux',
     'moment',
-    'react-datepicker'
+    'react-datepicker',
+    'jquery'
 ];
 
 gulp.task('scripts', function() {
