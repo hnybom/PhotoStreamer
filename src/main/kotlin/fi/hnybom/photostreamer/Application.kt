@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.http.CacheControl
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 
 /**
@@ -19,6 +20,7 @@ val rootFolder3 = "/Users/hnybom/Pictures/test"
 
 
 @SpringBootApplication
+@EnableScheduling
 open class Application : WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter() {
 
     @Bean
