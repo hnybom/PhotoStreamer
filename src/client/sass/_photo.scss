@@ -1,0 +1,12 @@
+.photo {
+  img {
+    max-width: 400px;
+  }
+
+  margin: 10px;
+
+}
+.images {
+  display: flex;
+  flex-wrap: wrap;
+}

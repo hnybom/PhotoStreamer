@@ -39,7 +39,9 @@ AppDispatcher.register((payload) => {
 
     switch (action.actionType) {
         case PhotoStreamerConstants.RECEIVE_PHOTOS:
-            console.log(payload.action.data);
+            _store.list = payload.action.data;
+            PhotoStreamerStoreInstance.emit(CHANGE_EVENT);
+            break;
     }
 });
 

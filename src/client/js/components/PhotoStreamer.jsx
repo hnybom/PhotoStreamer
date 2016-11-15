@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PhotoStreamerStore from '../stores/PhotoStreamerStore.js';
 import PhotoSearchBox from './PhotoSearchBox.jsx';
+import PhotoList from './PhotoList.jsx';
 
 class PhotoStreamer extends Component {
 
@@ -27,6 +28,9 @@ class PhotoStreamer extends Component {
             <div className="photoStreamer">
                 <h1>Etsi kuvia</h1>
                 <PhotoSearchBox />
+                <div className="panel-body">
+                    <PhotoList list={this.state.list}/>
+                </div>
             </div>
         );
         

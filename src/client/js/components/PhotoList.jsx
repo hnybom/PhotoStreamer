@@ -4,34 +4,24 @@
 import React from 'react';
 import Photo from './Photo.jsx';
 
-export default class TodoList extends React.Component {
+export default class PhotoList extends React.Component {
 
     render() {
         let rows = [];
         if (this.props.list) {
             this.props.list.map((item, index) => {
-                rows.push(<TodoItem key={index} index={index} item={item} />);
+                rows.push(<Photo url={item.path} index={index}/>);
             });
         }
-
-        if (this.props.editing) {
-            rows.push(<EditTodo key={-1} />);
-        }
-
         return (
-
-            <table className="table">
-                <tbody>
+            <div className="images">
                 {rows}
-                </tbody>
-            </table>
-
+            </div>
         );
     }
 }
 
-TodoList.propTypes = {
-    editing: React.PropTypes.bool,
+PhotoList.propTypes = {
     list: React.PropTypes.array,
 };
 

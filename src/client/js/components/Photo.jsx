@@ -11,8 +11,8 @@ export default class Photo extends React.Component {
 
     render() {
         return (
-            <div>
-                <img src="{this.props.url}" />
+            <div className="photo">
+                <img src={"http://localhost:8080" + this.props.url} />
             </div>
         );
     }

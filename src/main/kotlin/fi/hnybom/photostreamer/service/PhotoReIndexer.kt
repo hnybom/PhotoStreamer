@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class PhotoReIndexer @Autowired constructor(val service:FileSystemSource) {
 
-    @Scheduled(fixedRate = 3600)
+    @Scheduled(fixedRate = 3600000)
     fun reIxdex() {
         service.initPhotos()
     }

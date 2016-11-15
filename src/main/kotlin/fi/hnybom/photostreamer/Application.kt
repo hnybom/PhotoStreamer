@@ -16,7 +16,6 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 
 val rootFolder = "/volume1/Verkkolevy/sync/Google valokuvat"
 val rootFolder2 = "/Volumes/Verkkolevy/sync/Google valokuvat"
-val rootFolder3 = "/Users/hnybom/Pictures/test"
 
 
 @SpringBootApplication
